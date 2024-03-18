@@ -1,0 +1,9 @@
+name: AzLogin
+version: 1.0
+main: us.azcode.azlogin.AzLogin
+api-version: 1.13
+commands:
+  register:
+    usage: /register <password>
+  login:
+    usage: /login <password>
