@@ -32,6 +32,11 @@ public class LoginCommand implements CommandExecutor {
 
         String password = args[0];
 
+        if (!PlayerUtils.isRestricted(player)) {
+            player.sendMessage(ChatColor.RED + "You are already logged in.");
+            return true;
+        }
+
         try (Connection connection = HikariCPManager.getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT * FROM players WHERE name = ? AND password = ?")) {
             statement.setString(1, playerName);

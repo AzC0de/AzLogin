@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class RegisterCommand implements CommandExecutor {
@@ -32,10 +33,20 @@ public class RegisterCommand implements CommandExecutor {
         String password = args[0];
 
         try (Connection connection = HikariCPManager.getConnection();
-             PreparedStatement statement = connection.prepareStatement("INSERT INTO players (name, password) VALUES (?, ?)")) {
-            statement.setString(1, playerName);
-            statement.setString(2, password);
-            statement.executeUpdate();
+             PreparedStatement checkStmt = connection.prepareStatement("SELECT * FROM players WHERE name = ?");
+             PreparedStatement insertStmt = connection.prepareStatement("INSERT INTO players (name, password) VALUES (?, ?)")) {
+
+            checkStmt.setString(1, playerName);
+            ResultSet resultSet = checkStmt.executeQuery();
+
+            if (resultSet.next()) {
+                player.sendMessage(ChatColor.RED + "You are already registered.");
+                return true;
+            }
+
+            insertStmt.setString(1, playerName);
+            insertStmt.setString(2, password);
+            insertStmt.executeUpdate();
 
             player.sendMessage(ChatColor.GREEN + "You have successfully registered!");
             PlayerUtils.removeBlindness(player);
@@ -48,3 +59,4 @@ public class RegisterCommand implements CommandExecutor {
         return true;
     }
 }
+
